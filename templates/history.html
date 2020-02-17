@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2> Get History </h2>
+<h3> Select any filter to get the History</h3>
+<form action="" method="post"> 
+    <p>
+        {{form.start_date.label}}<br>
+        {{form.start_date(size=30)}} 
+    </p>   
+    <p>
+        {{form.end_date.label}}<br>
+        {{form.end_date(size=30)}} 
+    </p> 
+    <p>
+        {{form.submit()}}
+    </p>  
+    <p>Here is the search history between {{start_date}} and {{end_date}}: {{ data }}</p>
+
+    <p>
+        {{form.last_n.label}}<br>
+        {{form.last_n(size=30)}} 
+    </p>  
+    <p>
+        {{form.submit()}}
+    </p> 
+
+    <p>Here is the search history for last {{last_n}} enteries: {{ data_last_n }}</p>
+</form>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2> Get Location </h2>
+<h4> Please enter IP address in the form 000.000.000.000 </h4>
+<form action="" method="post">    
+    <p>
+        {{form.ip.label}}<br>
+        {{form.ip(size=30)}} 
+        {{Error}}
+    </p> 
+    <p>
+        {{form.submit()}}
+    </p>   
+    <p>Here are the location details: {{ location_detail }}</p>
+</form> 
+<h3>To get the search History hit the button billow: </h3>
+
+<form action="/history" method="post">
+    <button type="submit" value="History">Get History</button>
+</form> 
+<form action="/map" method="post">
+    <button type="submit" value="Map">See Map</button>
+</form> 
+{% endblock %}
