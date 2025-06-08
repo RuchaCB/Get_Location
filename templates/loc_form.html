@@ -1,25 +1,123 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2> Get Location </h2>
-<h4> Please enter IP address in the form 000.000.000.000 </h4>
-<form action="" method="post">    
-    <p>
-        {{form.ip.label}}<br>
-        {{form.ip(size=30)}} 
-        {{Error}}
-    </p> 
-    <p>
-        {{form.submit()}}
-    </p>   
-    <p>Here are the location details: {{ location_detail }}</p>
-</form> 
-<h3>To get the search History hit the button billow: </h3>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 30px;
+    background-color: #f4f4f4;
+  }
 
-<form action="/history" method="post">
-    <button type="submit" value="History">Get History</button>
-</form> 
-<form action="/map" method="post">
-    <button type="submit" value="Map">See Map</button>
-</form> 
+  h2, h4, h3 {
+    color: #333;
+  }
+
+  form {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  input[type="text"] {
+    padding: 8px;
+    font-size: 16px;
+    margin-right: 10px;
+    width: 280px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 10px;
+    margin-right: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    background: #fff;
+  }
+
+  th, td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  th {
+    background-color: #007bff;
+    color: white;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .no-data {
+    color: #888;
+    font-style: italic;
+  }
+</style>
+
+<h2>Get Location</h2>
+<h4>Please enter an IP address in the form 000.000.000.000</h4>
+
+<form method="POST">
+  <p>
+    {{ form.ip.label }}<br>
+    {{ form.ip() }}
+  </p>
+  <p>
+    {{ form.submit(class_='btn') }}
+  </p>
+</form>
+
+{% if location_detail %}
+  <h3>Location Details:</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>IP Address</th>
+        <th>Time</th>
+        <th>Country</th>
+        <th>Postal Code</th>
+        <th>City</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for detail in location_detail %}
+      <tr>
+        <td>{{ detail['ip'] }}</td>
+        <td>{{ detail['time'] }}</td>
+        <td>{{ detail['Country Name'] }}</td>
+        <td>{{ detail['Postal Code'] }}</td>
+        <td>{{ detail['City Name'] }}</td>
+        <td>{{ detail['latitude'] }}</td>
+        <td>{{ detail['longitude'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="no-data">No IP details to display yet. Submit an IP above.</p>
+{% endif %}
+
+<h3>Actions:</h3>
+<form action="/history" method="post" style="display: inline;">
+  <button type="submit" class="btn">Get History</button>
+</form>
+
+<form action="/map" method="post" style="display: inline;">
+  <button type="submit" class="btn">See Map</button>
+</form>
 {% endblock %}
