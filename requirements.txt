@@ -1,0 +1,5 @@
+Flask==2.3.2
+pymongo==4.6.1
+geoip2==4.7.0
+Flask-WTF==1.1.1
+WTForms==3.1.2
