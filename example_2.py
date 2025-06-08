@@ -6,7 +6,8 @@ import os
 import geoip2.database
 from datetime import datetime  
 from flask_wtf import Form
-from wtforms.fields.html5 import DateField
+#from wtforms.fields.html5 import DateField
+#from wtforms.fields import DateField
 
 app = Flask(__name__)
 app.config['SECRET_KEY']='Hello'
@@ -15,35 +16,57 @@ myclient = MongoClient("mongodb://localhost:27017/")
 mydb = myclient["mydatabase1"]
 mycol = mydb["users"]
 lat_lan=[]
-
-@app.route('/',methods=['GET', 'POST'])
+    
+@app.route('/', methods=['GET', 'POST'])
 def get_loc():
     location = LocationForm()
-    ip=request.values.get("ip")
+    ip = request.values.get("ip")
     details = []
     lat_lan[:] = []
-    try:
-        reader = geoip2.database.Reader("./GeoLite2-City_20200211/GeoLite2-City.mmdb")
-        response = reader.city(str(ip)) 
-        name = response.city.name
-        code = response.postal.code
-        time = str(datetime.now())
-        mycol.insert_one({ "ip":ip, "time":time, "Country Name": name, "Postal Code": code, "City Name":response.city.name, "latitude":response.location.latitude, "longitude":response.location.longitude})    
-        details.append({ "ip":ip, "time":time, "Country Name": name, "Postal Code": code, "City Name":response.city.name, "latitude":response.location.latitude, "longitude":response.location.longitude})    
-        lat_lan.append(response.location.latitude)
-        lat_lan.append(response.location.longitude)
-    except:
-        print("Error") 
-    location_detail = []
 
-    for x in mycol.find():
-        location_detail.append(x)
-    return render_template('/loc_form.html', form = location, location_detail = details)
+    if ip:
+        try:
+            reader = geoip2.database.Reader("./GeoLite2-City_20200211/GeoLite2-City.mmdb")
+            response = reader.city(str(ip)) 
 
+            city = response.city.name or "N/A"
+            code = response.postal.code or "N/A"
+            country = response.country.name or "N/A"
+            lat = response.location.latitude
+            lon = response.location.longitude
+            time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-@app.route('/map', methods = ['GET', 'POST'])
+            record = {
+                "ip": ip,
+                "time": time,
+                "Country Name": country,
+                "Postal Code": code,
+                "City Name": city,
+                "latitude": lat,
+                "longitude": lon
+            }
+
+            mycol.insert_one(record)
+            details.append(record)
+
+            lat_lan.extend([lat, lon])
+
+        except Exception as e:
+            print("GeoIP Lookup Error:", e)
+
+    return render_template('loc_form.html', form=location, location_detail=details)
+
+    
+@app.route('/map', methods=['GET', 'POST'])
 def map():
-    return render_template('map.html', lat_1 = lat_lan[0], lan_1=lat_lan[1])
+    # Make sure lat_lan has valid coordinates
+    if len(lat_lan) < 2:
+        # Default to some coordinates if none
+        lat, lon = 0, 0
+    else:
+        lat, lon = lat_lan[0], lat_lan[1]
+    return render_template('map.html', latitude=lat, longitude=lon)
+    
 
 @app.route("/history", methods = ['GET', 'POST'])
 def history():
